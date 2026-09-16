@@ -1,0 +1,18 @@
+# Java / Maven / Gradle
+target/
+build/
+.gradle/
+*.class
+
+# React / Node
+node_modules/
+dist/
+.build/
+
+# IDEs e Sistema
+.idea/
+.vscode/
+.DS_Store
+
+# Variáveis de ambiente com senhas
+.env
