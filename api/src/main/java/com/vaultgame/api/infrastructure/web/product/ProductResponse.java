@@ -14,6 +14,7 @@ public record ProductResponse(
         Integer stock,
         ProductCategory category,
         String brand,
+        String gtin,
         List<String> images,
         ProductDetails details,
         Boolean active) {
@@ -27,6 +28,7 @@ public record ProductResponse(
                 product.stock(),
                 product.category(),
                 product.brand(),
+                product.gtin(),
                 product.images(),
                 product.details(),
                 product.active());
