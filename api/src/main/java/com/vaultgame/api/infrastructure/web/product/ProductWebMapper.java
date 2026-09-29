@@ -14,13 +14,14 @@ public final class ProductWebMapper {
                 request.stock(),
                 request.category(),
                 request.brand(),
+                request.gtin(),
                 request.images(),
                 request.details(),
                 request.active());
     }
 
     public static Product toUpdatedProduct(String id, ProductWriteRequest request) {
-        return Product.restore(
+        return Product.forUpdate(
                 id,
                 request.name(),
                 request.description(),
@@ -28,6 +29,7 @@ public final class ProductWebMapper {
                 request.stock(),
                 request.category(),
                 request.brand(),
+                request.gtin(),
                 request.images(),
                 request.details(),
                 request.active());

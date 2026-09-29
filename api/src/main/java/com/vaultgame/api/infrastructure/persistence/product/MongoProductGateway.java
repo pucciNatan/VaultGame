@@ -6,6 +6,10 @@ import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Component;
 
+/**
+ * MongoDB adapter for {@link ProductGateway}. Persistence only — existence checks and business rules
+ * belong in application use cases.
+ */
 @Component
 public class MongoProductGateway implements ProductGateway {
 
@@ -34,5 +38,13 @@ public class MongoProductGateway implements ProductGateway {
     @Override
     public void deleteById(String id) {
         repository.deleteById(id);
+    }
+
+    @Override
+    public boolean existsByGtin(String gtin, String excludingProductId) {
+        if (excludingProductId == null) {
+            return repository.existsByGtin(gtin);
+        }
+        return repository.existsByGtinAndIdNot(gtin, excludingProductId);
     }
 }
