@@ -13,4 +13,6 @@ public interface ProductGateway {
     List<Product> findAll();
 
     void deleteById(String id);
+
+    boolean existsByGtin(String gtin, String excludingProductId);
 }
