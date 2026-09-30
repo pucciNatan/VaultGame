@@ -55,6 +55,39 @@ services:
     ports:
       - "8090:8090"
 
+  dbcustomer:
+    image: postgres:17
+    container_name: customer-service-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: customer_db
+    ports:
+      - "5437:5432"
+    volumes:
+      - customer_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d customer_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  customer:
+    build: ./customer-service
+    container_name: customer-service
+    depends_on:
+      dbcustomer:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://dbcustomer:5432/customer_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SERVER_PORT: 8091
+      JWT_SECRET: change-me-in-production-use-at-least-32-chars
+      JWT_ISSUER: vaultgame-identity
+      JWT_EXPIRATION_SECONDS: 3600
+    ports:
+      - "8091:8091"
   mailpit:
     image: axllent/mailpit:latest
     container_name: vaultgame-mailpit
@@ -135,3 +168,4 @@ volumes:
   tempo_data:
   grafana_data:
   fake_payment_gateway_data:
+  customer_db_data:
