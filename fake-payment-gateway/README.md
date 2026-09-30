@@ -27,10 +27,10 @@ src/main/java/com/vaultgame/fakepaymentgateway/
 
 ## Executar localmente
 
-1. Subir apenas o PostgreSQL:
+1. Na raiz do repositório, subir apenas o PostgreSQL do gateway:
 
 ```bash
-docker compose up db -d
+docker compose up dbpayments -d
 ```
 
 2. Rodar a aplicação (Java 21 + Maven):
@@ -51,10 +51,10 @@ Variáveis opcionais:
 
 ## Executar com Docker
 
-Na pasta `fake-payment-gateway`:
+Na raiz do repositório (`VaultGame/`):
 
 ```bash
-docker compose up --build
+docker compose up --build dbpayments paymentgateway
 ```
 
 API em `http://localhost:8090`.
