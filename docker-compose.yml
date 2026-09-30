@@ -23,6 +23,58 @@ services:
     volumes:
       - mongo_data:/data/db
 
+  dbpayments:
+    image: postgres:17
+    container_name: fake-payment-gateway-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: fake_payment_gateway
+    ports:
+      - "5436:5432"
+    volumes:
+      - fake_payment_gateway_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d fake_payment_gateway"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  paymentgateway:
+    build: ./fake-payment-gateway
+    container_name: fake-payment-gateway
+    depends_on:
+      dbpayments:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://dbpayments:5432/fake_payment_gateway
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SERVER_PORT: 8090
+      PAYMENT_TIMEOUT_MS: 5000
+    ports:
+      - "8090:8090"
+
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: vaultgame-mailpit
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+
+  email:
+    build: ./email-service
+    container_name: email-service
+    depends_on:
+      - mailpit
+    environment:
+      SERVER_PORT: 8092
+      SPRING_MAIL_HOST: mailpit
+      SPRING_MAIL_PORT: 1025
+      MAIL_FROM: noreply@vaultgame.local
+    ports:
+      - "8092:8092"
+
   otel-collector:
     image: otel/opentelemetry-collector-contrib:0.128.0
     container_name: vaultgame-otel-collector
@@ -82,3 +134,4 @@ volumes:
   prometheus_data:
   tempo_data:
   grafana_data:
+  fake_payment_gateway_data:
