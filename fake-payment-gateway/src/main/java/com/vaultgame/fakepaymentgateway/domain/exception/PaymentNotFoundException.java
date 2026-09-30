@@ -1,0 +1,8 @@
+package com.vaultgame.fakepaymentgateway.domain.exception;
+
+public class PaymentNotFoundException extends RuntimeException {
+
+    public PaymentNotFoundException(String transactionId) {
+        super("Payment not found: " + transactionId);
+    }
+}
