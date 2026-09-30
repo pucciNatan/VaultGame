@@ -1,4 +1,4 @@
-package com.vaultgame.api.domain;
+package com.vaultgame.api.domain.validators;
 
 import com.vaultgame.api.domain.exception.DomainException;
 

@@ -1,12 +1,12 @@
 package com.vaultgame.api.domain.entity;
 
-import static com.vaultgame.api.domain.DomainAssert.maxLength;
-import static com.vaultgame.api.domain.DomainAssert.min;
-import static com.vaultgame.api.domain.DomainAssert.positive;
-import static com.vaultgame.api.domain.DomainAssert.required;
-import static com.vaultgame.api.domain.DomainAssert.requiredText;
+import static com.vaultgame.api.domain.validators.DomainAssert.maxLength;
+import static com.vaultgame.api.domain.validators.DomainAssert.min;
+import static com.vaultgame.api.domain.validators.DomainAssert.positive;
+import static com.vaultgame.api.domain.validators.DomainAssert.required;
+import static com.vaultgame.api.domain.validators.DomainAssert.requiredText;
 
-import com.vaultgame.api.domain.GtinValidator;
+import com.vaultgame.api.domain.validators.GtinValidator;
 import com.vaultgame.api.domain.entity.product.details.ProductDetails;
 import com.vaultgame.api.domain.enums.ProductCategory;
 import com.vaultgame.api.domain.exception.DomainException;

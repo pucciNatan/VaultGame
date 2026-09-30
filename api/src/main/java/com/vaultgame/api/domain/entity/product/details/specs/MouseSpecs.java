@@ -1,7 +1,7 @@
 package com.vaultgame.api.domain.entity.product.details.specs;
 
-import static com.vaultgame.api.domain.DomainAssert.min;
-import static com.vaultgame.api.domain.DomainAssert.required;
+import static com.vaultgame.api.domain.validators.DomainAssert.min;
+import static com.vaultgame.api.domain.validators.DomainAssert.required;
 
 public record MouseSpecs(Integer dpi) implements PeripheralSpecs {
 

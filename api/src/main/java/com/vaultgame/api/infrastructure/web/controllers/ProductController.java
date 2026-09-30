@@ -1,10 +1,13 @@
-package com.vaultgame.api.infrastructure.web.product;
+package com.vaultgame.api.infrastructure.web.controllers;
 
 import com.vaultgame.api.application.usecases.product.CreateProductUseCase;
 import com.vaultgame.api.application.usecases.product.DeleteProductUseCase;
 import com.vaultgame.api.application.usecases.product.GetProductByIdUseCase;
 import com.vaultgame.api.application.usecases.product.ListProductsUseCase;
 import com.vaultgame.api.application.usecases.product.UpdateProductUseCase;
+import com.vaultgame.api.infrastructure.web.dto.ProductResponse;
+import com.vaultgame.api.infrastructure.web.dto.ProductWebMapper;
+import com.vaultgame.api.infrastructure.web.dto.ProductWriteRequest;
 import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.http.HttpStatus;

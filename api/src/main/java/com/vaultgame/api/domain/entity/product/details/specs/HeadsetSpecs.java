@@ -1,6 +1,6 @@
 package com.vaultgame.api.domain.entity.product.details.specs;
 
-import static com.vaultgame.api.domain.DomainAssert.min;
+import static com.vaultgame.api.domain.validators.DomainAssert.min;
 
 public record HeadsetSpecs(Integer batteryLifeHours) implements PeripheralSpecs {
 
