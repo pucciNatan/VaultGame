@@ -88,6 +88,25 @@ services:
       JWT_EXPIRATION_SECONDS: 3600
     ports:
       - "8091:8091"
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: vaultgame-mailpit
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+
+  email:
+    build: ./email-service
+    container_name: email-service
+    depends_on:
+      - mailpit
+    environment:
+      SERVER_PORT: 8092
+      SPRING_MAIL_HOST: mailpit
+      SPRING_MAIL_PORT: 1025
+      MAIL_FROM: noreply@vaultgame.local
+    ports:
+      - "8092:8092"
 
   otel-collector:
     image: otel/opentelemetry-collector-contrib:0.128.0
