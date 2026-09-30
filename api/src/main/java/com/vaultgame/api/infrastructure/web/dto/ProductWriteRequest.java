@@ -1,4 +1,4 @@
-package com.vaultgame.api.infrastructure.web.product;
+package com.vaultgame.api.infrastructure.web.dto;
 
 import com.vaultgame.api.domain.entity.product.details.ProductDetails;
 import com.vaultgame.api.domain.enums.ProductCategory;

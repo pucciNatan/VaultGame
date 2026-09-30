@@ -1,4 +1,4 @@
-package com.vaultgame.api.infrastructure.persistence.product;
+package com.vaultgame.api.infrastructure.persistence.entity;
 
 import com.vaultgame.api.domain.entity.Product;
 

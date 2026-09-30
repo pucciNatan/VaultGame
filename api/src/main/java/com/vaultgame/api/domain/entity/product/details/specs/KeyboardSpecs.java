@@ -1,7 +1,7 @@
 package com.vaultgame.api.domain.entity.product.details.specs;
 
-import static com.vaultgame.api.domain.DomainAssert.maxLength;
-import static com.vaultgame.api.domain.DomainAssert.requiredText;
+import static com.vaultgame.api.domain.validators.DomainAssert.maxLength;
+import static com.vaultgame.api.domain.validators.DomainAssert.requiredText;
 
 public record KeyboardSpecs(String switchType) implements PeripheralSpecs {
 

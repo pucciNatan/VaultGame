@@ -1,8 +1,8 @@
 package com.vaultgame.api.domain.entity.product.details;
 
-import static com.vaultgame.api.domain.DomainAssert.maxLength;
-import static com.vaultgame.api.domain.DomainAssert.required;
-import static com.vaultgame.api.domain.DomainAssert.requiredText;
+import static com.vaultgame.api.domain.validators.DomainAssert.maxLength;
+import static com.vaultgame.api.domain.validators.DomainAssert.required;
+import static com.vaultgame.api.domain.validators.DomainAssert.requiredText;
 
 import com.vaultgame.api.domain.entity.product.details.specs.AccessorySpecs;
 import com.vaultgame.api.domain.entity.product.details.specs.CableSpecs;

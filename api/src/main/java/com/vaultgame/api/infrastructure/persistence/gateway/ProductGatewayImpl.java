@@ -1,9 +1,13 @@
-package com.vaultgame.api.infrastructure.persistence.product;
+package com.vaultgame.api.infrastructure.persistence.gateway;
 
 import com.vaultgame.api.domain.entity.Product;
 import com.vaultgame.api.domain.gateway.ProductGateway;
 import java.util.List;
 import java.util.Optional;
+
+import com.vaultgame.api.infrastructure.persistence.entity.ProductDocument;
+import com.vaultgame.api.infrastructure.persistence.entity.ProductDocumentMapper;
+import com.vaultgame.api.infrastructure.persistence.repository.SpringDataProductRepository;
 import org.springframework.stereotype.Component;
 
 /**
@@ -11,11 +15,11 @@ import org.springframework.stereotype.Component;
  * belong in application use cases.
  */
 @Component
-public class MongoProductGateway implements ProductGateway {
+public class ProductGatewayImpl implements ProductGateway {
 
     private final SpringDataProductRepository repository;
 
-    public MongoProductGateway(SpringDataProductRepository repository) {
+    public ProductGatewayImpl(SpringDataProductRepository repository) {
         this.repository = repository;
     }
 
