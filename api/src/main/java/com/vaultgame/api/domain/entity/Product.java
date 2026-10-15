@@ -1,7 +1,6 @@
 package com.vaultgame.api.domain.entity;
 
 import static com.vaultgame.api.domain.validators.DomainAssert.maxLength;
-import static com.vaultgame.api.domain.validators.DomainAssert.min;
 import static com.vaultgame.api.domain.validators.DomainAssert.positive;
 import static com.vaultgame.api.domain.validators.DomainAssert.required;
 import static com.vaultgame.api.domain.validators.DomainAssert.requiredText;
@@ -18,7 +17,6 @@ public record Product(
         String name,
         String description,
         BigDecimal price,
-        Integer stock,
         ProductCategory category,
         String brand,
         String gtin,
@@ -36,7 +34,6 @@ public record Product(
             String name,
             String description,
             BigDecimal price,
-            Integer stock,
             ProductCategory category,
             String brand,
             String gtin,
@@ -45,7 +42,7 @@ public record Product(
             Boolean active) {
         String normalizedGtin = validateAndNormalizeGtinForWrite(category, gtin);
         Product product = new Product(
-                null, name, description, price, stock, category, brand, normalizedGtin, images, details, active);
+                null, name, description, price, category, brand, normalizedGtin, images, details, active);
         validateForWrite(product);
         return product;
     }
@@ -55,7 +52,6 @@ public record Product(
             String name,
             String description,
             BigDecimal price,
-            Integer stock,
             ProductCategory category,
             String brand,
             String gtin,
@@ -64,7 +60,7 @@ public record Product(
             Boolean active) {
         String normalizedGtin = validateAndNormalizeGtinForWrite(category, gtin);
         Product product = new Product(
-                id, name, description, price, stock, category, brand, normalizedGtin, images, details, active);
+                id, name, description, price, category, brand, normalizedGtin, images, details, active);
         validateForWrite(product);
         return product;
     }
@@ -74,7 +70,6 @@ public record Product(
             String name,
             String description,
             BigDecimal price,
-            Integer stock,
             ProductCategory category,
             String brand,
             String gtin,
@@ -82,7 +77,7 @@ public record Product(
             ProductDetails details,
             Boolean active) {
         return new Product(
-                id, name, description, price, stock, category, brand, gtin, images, details, active);
+                id, name, description, price, category, brand, gtin, images, details, active);
     }
 
     private static void validateForWrite(Product product) {
@@ -92,8 +87,6 @@ public record Product(
         maxLength(product.description(), 2000, "Description must have at most 2000 characters");
         required(product.price(), "Price is required");
         positive(product.price(), "Price must be greater than zero");
-        required(product.stock(), "Stock is required");
-        min(product.stock(), 0, "Stock cannot be negative");
         required(product.category(), "Category is required");
         requiredText(product.brand(), "Brand is required");
         maxLength(product.brand(), 100, "Brand must have at most 100 characters");
