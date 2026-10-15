@@ -1,0 +1,46 @@
+spring:
+  application:
+    name: order-service
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5438/order_db}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:postgres}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+  flyway:
+    enabled: true
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+
+server:
+  port: ${SERVER_PORT:8093}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: when_authorized
+
+vaultgame:
+  jwt:
+    secret: ${JWT_SECRET:change-me-in-production-use-at-least-32-chars}
+    issuer: ${JWT_ISSUER:vaultgame-identity}
+  cart:
+    ttl-days: ${CART_TTL_DAYS:7}
+  catalog:
+    base-url: ${CATALOG_BASE_URL:http://localhost:8080}
+  inventory:
+    base-url: ${INVENTORY_BASE_URL:http://localhost:8094}
+  payment:
+    base-url: ${PAYMENT_BASE_URL:http://localhost:8090}
+  email:
+    base-url: ${EMAIL_BASE_URL:http://localhost:8092}
+  customer:
+    base-url: ${CUSTOMER_BASE_URL:http://localhost:8091}
