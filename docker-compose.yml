@@ -108,6 +108,14 @@ services:
     ports:
       - "8092:8092"
 
+  redis:
+    image: redis:7
+    container_name: vaultgame-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
   dbinventory:
     image: postgres:17
     container_name: inventory-service-db
@@ -138,6 +146,58 @@ services:
       SERVER_PORT: 8094
     ports:
       - "8094:8094"
+
+  dborder:
+    image: postgres:17
+    container_name: order-service-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: order_db
+    ports:
+      - "5438:5432"
+    volumes:
+      - order_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d order_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  order:
+    build: ./order-service
+    container_name: order-service
+    depends_on:
+      dborder:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      inventory:
+        condition: service_started
+      paymentgateway:
+        condition: service_started
+      email:
+        condition: service_started
+      customer:
+        condition: service_started
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://dborder:5432/order_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SERVER_PORT: 8093
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      JWT_SECRET: change-me-in-production-use-at-least-32-chars
+      JWT_ISSUER: vaultgame-identity
+      CATALOG_BASE_URL: http://host.docker.internal:8080
+      INVENTORY_BASE_URL: http://inventory:8094
+      PAYMENT_BASE_URL: http://paymentgateway:8090
+      EMAIL_BASE_URL: http://email:8092
+      CUSTOMER_BASE_URL: http://customer:8091
+    ports:
+      - "8093:8093"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
   otel-collector:
     image: otel/opentelemetry-collector-contrib:0.128.0
@@ -201,3 +261,5 @@ volumes:
   fake_payment_gateway_data:
   customer_db_data:
   inventory_db_data:
+  order_db_data:
+  redis_data:
