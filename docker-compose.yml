@@ -108,6 +108,37 @@ services:
     ports:
       - "8092:8092"
 
+  dbinventory:
+    image: postgres:17
+    container_name: inventory-service-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: inventory_db
+    ports:
+      - "5439:5432"
+    volumes:
+      - inventory_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d inventory_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  inventory:
+    build: ./inventory-service
+    container_name: inventory-service
+    depends_on:
+      dbinventory:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://dbinventory:5432/inventory_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SERVER_PORT: 8094
+    ports:
+      - "8094:8094"
+
   otel-collector:
     image: otel/opentelemetry-collector-contrib:0.128.0
     container_name: vaultgame-otel-collector
@@ -169,3 +200,4 @@ volumes:
   grafana_data:
   fake_payment_gateway_data:
   customer_db_data:
+  inventory_db_data:
