@@ -21,7 +21,6 @@ public class ProductDocument {
     private String name;
     private String description;
     private BigDecimal price;
-    private Integer stock;
     private ProductCategory category;
     private String brand;
 

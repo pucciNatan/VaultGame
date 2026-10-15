@@ -55,6 +55,39 @@ services:
     ports:
       - "8090:8090"
 
+  dbcustomer:
+    image: postgres:17
+    container_name: customer-service-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: customer_db
+    ports:
+      - "5437:5432"
+    volumes:
+      - customer_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d customer_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  customer:
+    build: ./customer-service
+    container_name: customer-service
+    depends_on:
+      dbcustomer:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://dbcustomer:5432/customer_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SERVER_PORT: 8091
+      JWT_SECRET: change-me-in-production-use-at-least-32-chars
+      JWT_ISSUER: vaultgame-identity
+      JWT_EXPIRATION_SECONDS: 3600
+    ports:
+      - "8091:8091"
   mailpit:
     image: axllent/mailpit:latest
     container_name: vaultgame-mailpit
@@ -74,6 +107,97 @@ services:
       MAIL_FROM: noreply@vaultgame.local
     ports:
       - "8092:8092"
+
+  redis:
+    image: redis:7
+    container_name: vaultgame-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+  dbinventory:
+    image: postgres:17
+    container_name: inventory-service-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: inventory_db
+    ports:
+      - "5439:5432"
+    volumes:
+      - inventory_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d inventory_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  inventory:
+    build: ./inventory-service
+    container_name: inventory-service
+    depends_on:
+      dbinventory:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://dbinventory:5432/inventory_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SERVER_PORT: 8094
+    ports:
+      - "8094:8094"
+
+  dborder:
+    image: postgres:17
+    container_name: order-service-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: order_db
+    ports:
+      - "5438:5432"
+    volumes:
+      - order_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d order_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  order:
+    build: ./order-service
+    container_name: order-service
+    depends_on:
+      dborder:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      inventory:
+        condition: service_started
+      paymentgateway:
+        condition: service_started
+      email:
+        condition: service_started
+      customer:
+        condition: service_started
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://dborder:5432/order_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SERVER_PORT: 8093
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      JWT_SECRET: change-me-in-production-use-at-least-32-chars
+      JWT_ISSUER: vaultgame-identity
+      CATALOG_BASE_URL: http://host.docker.internal:8080
+      INVENTORY_BASE_URL: http://inventory:8094
+      PAYMENT_BASE_URL: http://paymentgateway:8090
+      EMAIL_BASE_URL: http://email:8092
+      CUSTOMER_BASE_URL: http://customer:8091
+    ports:
+      - "8093:8093"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
   otel-collector:
     image: otel/opentelemetry-collector-contrib:0.128.0
@@ -135,3 +259,7 @@ volumes:
   tempo_data:
   grafana_data:
   fake_payment_gateway_data:
+  customer_db_data:
+  inventory_db_data:
+  order_db_data:
+  redis_data:
