@@ -12,7 +12,6 @@ public final class ProductDocumentMapper {
         document.setName(product.name());
         document.setDescription(product.description());
         document.setPrice(product.price());
-        document.setStock(product.stock());
         document.setCategory(product.category());
         document.setBrand(product.brand());
         document.setGtin(product.gtin());
@@ -28,7 +27,6 @@ public final class ProductDocumentMapper {
                 document.getName(),
                 document.getDescription(),
                 document.getPrice(),
-                document.getStock(),
                 document.getCategory(),
                 document.getBrand(),
                 document.getGtin(),
