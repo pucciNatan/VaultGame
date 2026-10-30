@@ -1,8 +1,8 @@
-package com.vaultgame.email.infrastructure.web;
+package com.vaultgame.email.adapter.in.web;
 
+import com.vaultgame.email.adapter.in.web.dto.ErrorResponse;
 import com.vaultgame.email.domain.exception.EmailSendException;
 import com.vaultgame.email.domain.exception.UnknownTemplateException;
-import com.vaultgame.email.infrastructure.web.dto.ErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -37,9 +37,9 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler({
-            HttpMessageNotReadableException.class,
-            MethodArgumentTypeMismatchException.class,
-            IllegalArgumentException.class
+        HttpMessageNotReadableException.class,
+        MethodArgumentTypeMismatchException.class,
+        IllegalArgumentException.class
     })
     public ResponseEntity<ErrorResponse> handleBadRequest(Exception ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)

@@ -1,12 +1,11 @@
-package com.vaultgame.email.infrastructure.mail;
+package com.vaultgame.email.adapter.out.mail;
 
+import com.vaultgame.email.application.port.out.EmailTemplateRendererPort;
 import com.vaultgame.email.domain.model.EmailTemplate;
-import com.vaultgame.email.domain.port.EmailTemplateRendererPort;
+import java.util.Map;
 import org.springframework.stereotype.Component;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
-
-import java.util.Map;
 
 @Component
 public class ThymeleafTemplateRenderer implements EmailTemplateRendererPort {

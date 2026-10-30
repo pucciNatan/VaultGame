@@ -1,7 +1,6 @@
-package com.vaultgame.email.domain.port;
+package com.vaultgame.email.application.port.out;
 
 import com.vaultgame.email.domain.model.EmailTemplate;
-
 import java.util.Map;
 
 public interface EmailTemplateRendererPort {

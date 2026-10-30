@@ -1,9 +1,9 @@
-package com.vaultgame.email.infrastructure.mail;
+package com.vaultgame.email.adapter.out.mail;
 
+import com.vaultgame.email.application.port.out.EmailSenderPort;
+import com.vaultgame.email.config.MailProperties;
 import com.vaultgame.email.domain.exception.EmailSendException;
 import com.vaultgame.email.domain.model.EmailMessage;
-import com.vaultgame.email.domain.port.EmailSenderPort;
-import com.vaultgame.email.infrastructure.config.MailProperties;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -25,7 +25,8 @@ public class JavaMailSenderAdapter implements EmailSenderPort {
     public void send(EmailMessage message) {
         try {
             MimeMessage mimeMessage = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED, "UTF-8");
+            MimeMessageHelper helper =
+                    new MimeMessageHelper(mimeMessage, MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED, "UTF-8");
             helper.setFrom(mailProperties.from());
             helper.setTo(message.to());
             helper.setSubject(message.subject());

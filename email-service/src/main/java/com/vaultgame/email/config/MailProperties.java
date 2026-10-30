@@ -1,4 +1,4 @@
-package com.vaultgame.email.infrastructure.config;
+package com.vaultgame.email.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
