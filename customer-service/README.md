@@ -2,6 +2,8 @@
 
 Microserviço de **conta do usuário** no VaultGame: cadastro, login (JWT), perfil, endereços e lista de desejos. Tudo roda em **um único processo** e **um banco PostgreSQL**, com capacidades internas separadas por pacotes (hexagonal).
 
+Convenções: ver [ARCHITECTURE.md](../ARCHITECTURE.md).
+
 ## Capacidades internas
 
 | Módulo | Responsabilidade |
