@@ -1,6 +1,8 @@
 # VaultGame
 Plataforma e-commerce de games baseada em microsserviços orientados a eventos (Kafka), Spring Boot, React/TypeScript e persistência poliglota (PostgreSQL + MongoDB).
 
+Convenções de arquitetura hexagonal nos serviços Java: [ARCHITECTURE.md](ARCHITECTURE.md).
+
 ## Serviços (dev)
 
 | Serviço | Porta | Descrição |

@@ -2,6 +2,8 @@
 
 Microserviço de **pedidos** e **carrinho** (Redis): visitante (`X-Cart-Id`), usuário autenticado (JWT), merge ao logar e checkout orquestrado (catálogo, estoque, pagamento, e-mail).
 
+Convenções: ver [ARCHITECTURE.md](../ARCHITECTURE.md).
+
 ## Capacidades internas
 
 | Módulo | Persistência | Responsabilidade |
