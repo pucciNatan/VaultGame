@@ -4,6 +4,8 @@ Microserviço de **envio de e-mails** com templates HTML (Thymeleaf) e SMTP. Em 
 
 Outros microserviços **não** estão integrados ainda. O consumo via **Kafka** está planejado (ver abaixo).
 
+Convenções: ver [ARCHITECTURE.md](../ARCHITECTURE.md).
+
 ## Arquitetura
 
 Hexagonal, **sem banco de dados**:

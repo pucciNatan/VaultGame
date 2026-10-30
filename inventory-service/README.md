@@ -2,6 +2,8 @@
 
 Microserviço de **estoque** do VaultGame: disponibilidade por `productId` e reservas para checkout (commit/release). É a **única fonte de verdade** de quantidade após a migração do catálogo.
 
+Convenções: ver [ARCHITECTURE.md](../ARCHITECTURE.md).
+
 ## Arquitetura
 
 ```
