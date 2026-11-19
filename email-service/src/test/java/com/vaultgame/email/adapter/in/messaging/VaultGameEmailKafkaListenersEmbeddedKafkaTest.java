@@ -25,6 +25,7 @@ import org.springframework.kafka.test.utils.KafkaTestUtils;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -48,6 +49,7 @@ import static org.mockito.Mockito.verify;
 })
 class VaultGameEmailKafkaListenersEmbeddedKafkaTest {
 
+    @MockitoBean
     private SendTemplatedEmailPort sendTemplatedEmailPort;
 
     @Autowired
