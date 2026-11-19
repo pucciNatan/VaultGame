@@ -6,8 +6,7 @@ import com.vaultgame.order.application.port.in.GetOrderPort;
 import com.vaultgame.order.application.port.in.PlaceOrderPort;
 import com.vaultgame.order.application.port.out.CartRepositoryPort;
 import com.vaultgame.order.application.port.out.CatalogPort;
-import com.vaultgame.order.application.port.out.CustomerPort;
-import com.vaultgame.order.application.port.out.EmailPort;
+import com.vaultgame.order.application.port.out.OrderEventPublisherPort;
 import com.vaultgame.order.application.port.out.InventoryPort;
 import com.vaultgame.order.application.port.out.OrderRepositoryPort;
 import com.vaultgame.order.application.port.out.PaymentPort;
@@ -22,6 +21,11 @@ import org.springframework.web.client.RestClient;
 @Configuration
 @EnableConfigurationProperties(ServiceUrlsProperties.class)
 public class OrderUseCaseConfig {
+
+    @Bean
+    CartProperties cartProperties(ServiceUrlsProperties serviceUrlsProperties) {
+        return serviceUrlsProperties.cart();
+    }
 
     @Bean
     RestClient.Builder restClientBuilder() {
@@ -45,8 +49,7 @@ public class OrderUseCaseConfig {
             CatalogPort catalogPort,
             InventoryPort inventoryPort,
             PaymentPort paymentPort,
-            EmailPort emailPort,
-            CustomerPort customerPort
+            OrderEventPublisherPort orderEventPublisherPort
     ) {
         return new PlaceOrderUseCase(
                 cartPort,
@@ -54,8 +57,7 @@ public class OrderUseCaseConfig {
                 catalogPort,
                 inventoryPort,
                 paymentPort,
-                emailPort,
-                customerPort
+                orderEventPublisherPort
         );
     }
 

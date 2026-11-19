@@ -45,12 +45,16 @@ public class OrderController {
     @PostMapping("/checkout")
     public ResponseEntity<OrderDtos.OrderResponse> checkout(
             @AuthenticationPrincipal Jwt jwt,
-            @RequestHeader(value = "Authorization") String authorization,
             @RequestHeader(value = "Idempotency-Key", required = false) String idempotencyKey,
             @Valid @RequestBody OrderDtos.CheckoutRequest request
     ) {
         UUID customerId = cartIdentityResolver.requireCustomerId(jwt);
         String cartKey = cartIdentityResolver.resolveCartKey(null);
+        String email = jwt.getClaimAsString("email");
+        String fullName = jwt.getClaimAsString("fullName");
+        if (fullName == null || fullName.isBlank()) {
+            fullName = email != null ? email : "Cliente";
+        }
         Order order = placeOrderPort.checkout(new CheckoutCommand(
                 customerId,
                 cartKey,
@@ -58,7 +62,8 @@ public class OrderController {
                 request.paymentMethod().type(),
                 request.paymentMethod().token(),
                 idempotencyKey,
-                authorization
+                email,
+                fullName
         ));
         HttpStatus status = order.status() == OrderStatus.PAID
                 ? HttpStatus.CREATED

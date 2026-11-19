@@ -10,7 +10,6 @@ import org.springframework.web.client.RestClient;
 
 import java.util.UUID;
 
-@Component
 public class CustomerRestAdapter implements CustomerPort {
 
     private final RestClient restClient;

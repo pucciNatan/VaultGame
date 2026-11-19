@@ -9,6 +9,7 @@ public record CheckoutCommand(
         String paymentMethodType,
         String paymentMethodToken,
         String idempotencyKey,
-        String bearerToken
+        String customerEmail,
+        String customerFullName
 ) {
 }
