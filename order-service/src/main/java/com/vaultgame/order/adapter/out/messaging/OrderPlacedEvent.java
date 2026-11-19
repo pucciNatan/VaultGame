@@ -1,10 +1,7 @@
 package com.vaultgame.order.adapter.out.messaging;
 
-import java.time.Instant;
-import java.util.UUID;
-
 /**
- * Contract for a future Kafka event on topic {@code vaultgame.order.placed}.
+ * Kafka event on topic {@code vaultgame.order.paid} — see {@link OrderPaidMessage}.
  */
-public record OrderPlacedEvent(UUID orderId, UUID customerId, Instant placedAt) {
+public record OrderPlacedEvent(java.util.UUID orderId, java.util.UUID customerId, java.time.Instant placedAt) {
 }

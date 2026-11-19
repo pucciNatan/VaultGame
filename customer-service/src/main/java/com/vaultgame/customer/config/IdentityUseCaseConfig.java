@@ -10,6 +10,7 @@ import com.vaultgame.customer.application.port.out.UserRepositoryPort;
 import com.vaultgame.customer.application.usecase.identity.GetCurrentUserUseCase;
 import com.vaultgame.customer.application.usecase.identity.LoginUseCase;
 import com.vaultgame.customer.application.usecase.identity.RegisterUseCase;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -21,9 +22,10 @@ public class IdentityUseCaseConfig {
             UserRepositoryPort userRepository,
             CustomerRepositoryPort customerRepository,
             PasswordHasherPort passwordHasher,
-            TokenIssuerPort tokenIssuer
+            TokenIssuerPort tokenIssuer,
+            ApplicationEventPublisher eventPublisher
     ) {
-        return new RegisterUseCase(userRepository, customerRepository, passwordHasher, tokenIssuer);
+        return new RegisterUseCase(userRepository, customerRepository, passwordHasher, tokenIssuer, eventPublisher);
     }
 
     @Bean

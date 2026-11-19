@@ -13,8 +13,7 @@ import com.vaultgame.order.domain.model.order.OrderLine;
 import com.vaultgame.order.application.port.out.OrderRepositoryPort;
 import com.vaultgame.order.domain.model.order.OrderStatus;
 import com.vaultgame.order.application.port.out.CatalogPort;
-import com.vaultgame.order.application.port.out.CustomerPort;
-import com.vaultgame.order.application.port.out.EmailPort;
+import com.vaultgame.order.application.port.out.OrderEventPublisherPort;
 import com.vaultgame.order.application.port.out.InventoryPort;
 import com.vaultgame.order.application.port.out.PaymentPort;
 import com.vaultgame.order.application.port.out.model.CatalogProduct;
@@ -40,8 +39,7 @@ public class PlaceOrderUseCase implements PlaceOrderPort {
     private final CatalogPort catalogPort;
     private final InventoryPort inventoryPort;
     private final PaymentPort paymentPort;
-    private final EmailPort emailPort;
-    private final CustomerPort customerPort;
+    private final OrderEventPublisherPort orderEventPublisherPort;
 
     public PlaceOrderUseCase(
             CartPort cartPort,
@@ -49,16 +47,14 @@ public class PlaceOrderUseCase implements PlaceOrderPort {
             CatalogPort catalogPort,
             InventoryPort inventoryPort,
             PaymentPort paymentPort,
-            EmailPort emailPort,
-            CustomerPort customerPort
+            OrderEventPublisherPort orderEventPublisherPort
     ) {
         this.cartPort = cartPort;
         this.orderRepositoryPort = orderRepositoryPort;
         this.catalogPort = catalogPort;
         this.inventoryPort = inventoryPort;
         this.paymentPort = paymentPort;
-        this.emailPort = emailPort;
-        this.customerPort = customerPort;
+        this.orderEventPublisherPort = orderEventPublisherPort;
     }
 
     @Override
@@ -151,7 +147,7 @@ public class PlaceOrderUseCase implements PlaceOrderPort {
             Order paid = orderRepositoryPort.save(
                     pendingOrder.withPayment(payment.transactionId(), OrderStatus.PAID)
             );
-            sendConfirmationEmail(command, paid);
+            sendOrderPaidEvent(command, paid);
             cartPort.clear(command.cartKey());
             return paid;
         }
@@ -165,9 +161,15 @@ public class PlaceOrderUseCase implements PlaceOrderPort {
         );
     }
 
-    private void sendConfirmationEmail(CheckoutCommand command, Order order) {
-        var profile = customerPort.getProfile(command.customerId(), command.bearerToken());
-        emailPort.sendOrderConfirmed(profile.email(), order.id(), profile.fullName());
+    private void sendOrderPaidEvent(CheckoutCommand command, Order order) {
+        orderEventPublisherPort.publishPaid(
+                order.id(),
+                command.customerId(),
+                command.customerEmail(),
+                command.customerFullName(),
+                order.totalAmount(),
+                order.currency()
+        );
     }
 
     private Order resolveIdempotentReplay(Order existing, String requestHash, String idempotencyKey) {

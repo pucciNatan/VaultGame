@@ -7,10 +7,8 @@ import com.vaultgame.order.application.port.out.model.PaymentResult;
 import com.vaultgame.order.config.ServiceUrlsProperties;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
-import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
-@Component
 public class PaymentRestAdapter implements PaymentPort {
 
     private final RestClient restClient;

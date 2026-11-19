@@ -9,7 +9,6 @@ public record ServiceUrlsProperties(
         CatalogProperties catalog,
         InventoryProperties inventory,
         PaymentProperties payment,
-        EmailProperties email,
         CustomerProperties customer
 ) {
 
@@ -20,9 +19,6 @@ public record ServiceUrlsProperties(
     }
 
     public record PaymentProperties(String baseUrl) {
-    }
-
-    public record EmailProperties(String baseUrl) {
     }
 
     public record CustomerProperties(String baseUrl) {

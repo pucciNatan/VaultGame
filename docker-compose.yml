@@ -46,12 +46,15 @@ services:
     depends_on:
       dbpayments:
         condition: service_healthy
+      kafka:
+        condition: service_healthy
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://dbpayments:5432/fake_payment_gateway
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres
       SERVER_PORT: 8090
       PAYMENT_TIMEOUT_MS: 5000
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     ports:
       - "8090:8090"
 
@@ -78,6 +81,8 @@ services:
     depends_on:
       dbcustomer:
         condition: service_healthy
+      kafka:
+        condition: service_healthy
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://dbcustomer:5432/customer_db
       SPRING_DATASOURCE_USERNAME: postgres
@@ -86,6 +91,7 @@ services:
       JWT_SECRET: change-me-in-production-use-at-least-32-chars
       JWT_ISSUER: vaultgame-identity
       JWT_EXPIRATION_SECONDS: 3600
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     ports:
       - "8091:8091"
   mailpit:
@@ -99,12 +105,16 @@ services:
     build: ./email-service
     container_name: email-service
     depends_on:
-      - mailpit
+      mailpit:
+        condition: service_started
+      kafka:
+        condition: service_healthy
     environment:
       SERVER_PORT: 8092
       SPRING_MAIL_HOST: mailpit
       SPRING_MAIL_PORT: 1025
       MAIL_FROM: noreply@vaultgame.local
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     ports:
       - "8092:8092"
 
@@ -115,6 +125,32 @@ services:
       - "6379:6379"
     volumes:
       - redis_data:/data
+
+  kafka:
+    image: apache/kafka:3.9.0
+    container_name: vaultgame-kafka
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,CONTROLLER://kafka:9093,PLAINTEXT_HOST://0.0.0.0:9094
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:9094
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+    ports:
+      - "9094:9094"
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/kafka/bin/kafka-broker-api-versions.sh --bootstrap-server localhost:9092 >/dev/null 2>&1 || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+      start_period: 40s
 
   dbinventory:
     image: postgres:17
@@ -139,11 +175,14 @@ services:
     depends_on:
       dbinventory:
         condition: service_healthy
+      kafka:
+        condition: service_healthy
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://dbinventory:5432/inventory_db
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres
       SERVER_PORT: 8094
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     ports:
       - "8094:8094"
 
@@ -176,10 +215,10 @@ services:
         condition: service_started
       paymentgateway:
         condition: service_started
-      email:
-        condition: service_started
       customer:
         condition: service_started
+      kafka:
+        condition: service_healthy
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://dborder:5432/order_db
       SPRING_DATASOURCE_USERNAME: postgres
@@ -189,11 +228,7 @@ services:
       REDIS_PORT: 6379
       JWT_SECRET: change-me-in-production-use-at-least-32-chars
       JWT_ISSUER: vaultgame-identity
-      CATALOG_BASE_URL: http://host.docker.internal:8080
-      INVENTORY_BASE_URL: http://inventory:8094
-      PAYMENT_BASE_URL: http://paymentgateway:8090
-      EMAIL_BASE_URL: http://email:8092
-      CUSTOMER_BASE_URL: http://customer:8091
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     ports:
       - "8093:8093"
     extra_hosts:

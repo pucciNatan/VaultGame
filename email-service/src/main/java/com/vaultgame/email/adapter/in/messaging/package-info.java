@@ -1,7 +1,4 @@
 /**
- * Messaging adapters (Kafka) will live here.
- * <p>
- * Planned: {@code KafkaEmailConsumer} with {@code @KafkaListener(topics = "vaultgame.email.send")}
- * mapping {@link EmailCommand} to {@code SendTemplatedEmailPort}.
+ * Inbound Kafka listeners and manual REST email command types.
  */
 package com.vaultgame.email.adapter.in.messaging;
