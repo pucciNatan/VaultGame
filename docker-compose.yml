@@ -199,6 +199,26 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
 
+  web:
+    build: ./web
+    container_name: vaultgame-web
+    depends_on:
+      customer:
+        condition: service_started
+      order:
+        condition: service_started
+      inventory:
+        condition: service_started
+    environment:
+      CATALOG_API_URL: http://host.docker.internal:8080
+      CUSTOMER_API_URL: http://customer:8091
+      ORDER_API_URL: http://order:8093
+      INVENTORY_API_URL: http://inventory:8094
+    ports:
+      - "3000:3000"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
   otel-collector:
     image: otel/opentelemetry-collector-contrib:0.128.0
     container_name: vaultgame-otel-collector
