@@ -13,7 +13,6 @@ import org.springframework.web.client.RestClient;
 import java.util.List;
 import java.util.UUID;
 
-@Component
 public class InventoryRestAdapter implements InventoryPort {
 
     private final RestClient restClient;

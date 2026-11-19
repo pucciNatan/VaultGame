@@ -11,6 +11,13 @@ spring:
     open-in-view: false
   flyway:
     enabled: true
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9094}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring.json.add.type.headers: false
   data:
     redis:
       host: ${REDIS_HOST:localhost}
@@ -29,6 +36,9 @@ management:
       show-details: when_authorized
 
 vaultgame:
+  checkout:
+    kafka:
+      reply-timeout: 10s
   jwt:
     secret: ${JWT_SECRET:change-me-in-production-use-at-least-32-chars}
     issuer: ${JWT_ISSUER:vaultgame-identity}

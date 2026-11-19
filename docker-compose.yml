@@ -46,12 +46,15 @@ services:
     depends_on:
       dbpayments:
         condition: service_healthy
+      kafka:
+        condition: service_healthy
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://dbpayments:5432/fake_payment_gateway
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres
       SERVER_PORT: 8090
       PAYMENT_TIMEOUT_MS: 5000
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     ports:
       - "8090:8090"
 
@@ -165,11 +168,14 @@ services:
     depends_on:
       dbinventory:
         condition: service_healthy
+      kafka:
+        condition: service_healthy
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://dbinventory:5432/inventory_db
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres
       SERVER_PORT: 8094
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     ports:
       - "8094:8094"
 
@@ -206,6 +212,8 @@ services:
         condition: service_started
       customer:
         condition: service_started
+      kafka:
+        condition: service_healthy
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://dborder:5432/order_db
       SPRING_DATASOURCE_USERNAME: postgres
@@ -215,9 +223,7 @@ services:
       REDIS_PORT: 6379
       JWT_SECRET: change-me-in-production-use-at-least-32-chars
       JWT_ISSUER: vaultgame-identity
-      CATALOG_BASE_URL: http://host.docker.internal:8080
-      INVENTORY_BASE_URL: http://inventory:8094
-      PAYMENT_BASE_URL: http://paymentgateway:8090
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       EMAIL_BASE_URL: http://email:8092
       CUSTOMER_BASE_URL: http://customer:8091
     ports:
