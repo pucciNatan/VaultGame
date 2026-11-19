@@ -5,7 +5,10 @@ import com.vaultgame.customer.application.port.in.DeleteAddressPort;
 import com.vaultgame.customer.application.port.in.ListAddressesPort;
 import com.vaultgame.customer.application.port.in.UpdateAddressPort;
 import com.vaultgame.customer.application.port.out.AddressRepositoryPort;
-import com.vaultgame.customer.application.usecase.address.AddressUseCase;
+import com.vaultgame.customer.application.usecase.address.CreateAddressUseCase;
+import com.vaultgame.customer.application.usecase.address.DeleteAddressUseCase;
+import com.vaultgame.customer.application.usecase.address.ListAddressesUseCase;
+import com.vaultgame.customer.application.usecase.address.UpdateAddressUseCase;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -13,32 +16,40 @@ import org.springframework.context.annotation.Configuration;
 public class AddressUseCaseConfig {
 
     @Bean
-    AddressUseCase addressUseCase(AddressRepositoryPort addressRepository) {
-        return new AddressUseCase(addressRepository);
+    public ListAddressesPort listAddressesPort(AddressRepositoryPort addressRepository) {
+        return new ListAddressesUseCase(addressRepository);
     }
 
     @Bean
-    TransactionalAddressFacade transactionalAddressFacade(AddressUseCase addressUseCase) {
-        return new TransactionalAddressFacade(addressUseCase);
+    public DeleteAddressPort deleteAddressPort(AddressRepositoryPort addressRepository) {
+        return new DeleteAddressUseCase(addressRepository);
     }
 
     @Bean
-    ListAddressesPort listAddressesPort(AddressUseCase addressUseCase) {
-        return addressUseCase;
+    CreateAddressUseCase createAddressUseCase(AddressRepositoryPort addressRepository) {
+        return new CreateAddressUseCase(addressRepository);
     }
 
     @Bean
-    DeleteAddressPort deleteAddressPort(AddressUseCase addressUseCase) {
-        return addressUseCase;
+    UpdateAddressUseCase updateAddressUseCase(AddressRepositoryPort addressRepository) {
+        return new UpdateAddressUseCase(addressRepository);
     }
 
     @Bean
-    CreateAddressPort createAddressPort(TransactionalAddressFacade transactionalAddressFacade) {
+    TransactionalAddressFacade transactionalAddressFacade(
+            CreateAddressUseCase createAddressUseCase,
+            UpdateAddressUseCase updateAddressUseCase
+    ) {
+        return new TransactionalAddressFacade(createAddressUseCase, updateAddressUseCase);
+    }
+
+    @Bean
+    public CreateAddressPort createAddressPort(TransactionalAddressFacade transactionalAddressFacade) {
         return transactionalAddressFacade;
     }
 
     @Bean
-    UpdateAddressPort updateAddressPort(TransactionalAddressFacade transactionalAddressFacade) {
+    public UpdateAddressPort updateAddressPort(TransactionalAddressFacade transactionalAddressFacade) {
         return transactionalAddressFacade;
     }
 }
