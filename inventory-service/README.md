@@ -73,6 +73,11 @@ Formato: `{ "code": "...", "message": "..." }`
 
 Códigos: `INVENTORY_NOT_FOUND`, `INSUFFICIENT_STOCK`, `RESERVATION_NOT_FOUND`, `INVALID_RESERVATION_STATE`, `INVENTORY_CONFLICT`, `INVALID_REQUEST`, `INTERNAL_ERROR`.
 
-## Kafka (futuro)
+## Kafka
 
-Stub `InventoryAdjustedEvent` em `infrastructure/messaging`.
+| Tópico | Papel |
+|--------|--------|
+| `vaultgame.checkout.commands.inventory` | Consumidor: reserve / commit / release (checkout saga) |
+| `vaultgame.checkout.replies` | Respostas correlacionadas para o `order-service` |
+
+REST `/internal/reservations` permanece para debug/ops.
