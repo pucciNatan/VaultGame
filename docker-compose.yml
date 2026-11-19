@@ -81,6 +81,8 @@ services:
     depends_on:
       dbcustomer:
         condition: service_healthy
+      kafka:
+        condition: service_healthy
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://dbcustomer:5432/customer_db
       SPRING_DATASOURCE_USERNAME: postgres
@@ -89,6 +91,7 @@ services:
       JWT_SECRET: change-me-in-production-use-at-least-32-chars
       JWT_ISSUER: vaultgame-identity
       JWT_EXPIRATION_SECONDS: 3600
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     ports:
       - "8091:8091"
   mailpit:
@@ -102,12 +105,16 @@ services:
     build: ./email-service
     container_name: email-service
     depends_on:
-      - mailpit
+      mailpit:
+        condition: service_started
+      kafka:
+        condition: service_healthy
     environment:
       SERVER_PORT: 8092
       SPRING_MAIL_HOST: mailpit
       SPRING_MAIL_PORT: 1025
       MAIL_FROM: noreply@vaultgame.local
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     ports:
       - "8092:8092"
 
@@ -208,8 +215,6 @@ services:
         condition: service_started
       paymentgateway:
         condition: service_started
-      email:
-        condition: service_started
       customer:
         condition: service_started
       kafka:
@@ -224,8 +229,6 @@ services:
       JWT_SECRET: change-me-in-production-use-at-least-32-chars
       JWT_ISSUER: vaultgame-identity
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-      EMAIL_BASE_URL: http://email:8092
-      CUSTOMER_BASE_URL: http://customer:8091
     ports:
       - "8093:8093"
     extra_hosts:
