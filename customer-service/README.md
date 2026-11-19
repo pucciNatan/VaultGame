@@ -135,6 +135,12 @@ Formato:
 
 Códigos comuns: `EMAIL_ALREADY_REGISTERED`, `INVALID_CREDENTIALS`, `UNAUTHORIZED`, `NOT_FOUND`, `ADDRESS_LIMIT_EXCEEDED`, `WISHLIST_ITEM_ALREADY_EXISTS`, `INVALID_REQUEST`, `INTERNAL_ERROR`.
 
-## Kafka (futuro)
+## Kafka
 
-Integração com outros microserviços via **Kafka** e **REST** está prevista, mas **não implementada**. Evento sugerido para evolução: `CustomerRegistered` (após registro bem-sucedido).
+Após registro bem-sucedido (commit da transação), publica **`vaultgame.customer.registered`** com `customerId`, `email`, `fullName`. Falha no broker **não** falha o HTTP de registro (log + métricas).
+
+| Variável | Padrão |
+|----------|--------|
+| `KAFKA_BOOTSTRAP_SERVERS` | `localhost:9094` (host) / `kafka:9092` no Compose |
+
+Subir broker: `docker compose up kafka dbcustomer customer -d`

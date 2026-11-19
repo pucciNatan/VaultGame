@@ -1,6 +1,8 @@
 # order-service
 
-Microserviço de **pedidos** e **carrinho** (Redis): visitante (`X-Cart-Id`), usuário autenticado (JWT), merge ao logar e checkout orquestrado (catálogo, estoque, pagamento, e-mail).
+Microserviço de **pedidos** e **carrinho** (Redis): visitante (`X-Cart-Id`), usuário autenticado (JWT), merge ao logar e checkout orquestrado via **saga Kafka** (request-reply síncrono na API).
+
+**E-mail de confirmação:** publicado em Kafka (`vaultgame.order.paid`) quando o pagamento fica `PAID`.
 
 Convenções: ver [ARCHITECTURE.md](../ARCHITECTURE.md).
 
@@ -11,24 +13,17 @@ Convenções: ver [ARCHITECTURE.md](../ARCHITECTURE.md).
 | **cart** | Redis | Itens por chave `cart:guest:{uuid}` ou `cart:user:{customerId}` |
 | **order** | PostgreSQL | Pedidos, linhas, status, idempotência |
 
-## Arquitetura
-
-```
-src/main/java/com/vaultgame/order/
-├── domain/          cart, order, ports (catalog, inventory, payment, email, customer)
-├── application/     CartService, PlaceOrderService, GetOrderService
-└── infrastructure/  redis, web, persistence, client (RestClient), security, messaging stub
-```
+Checkout **síncrono na HTTP**, comunicação inter-serviços por **Kafka** (catálogo, estoque, pagamento). E-mail e `fullName` vêm do JWT (`email`, `fullName`).
 
 ## Executar localmente
 
 1. Dependências:
 
 ```bash
-docker compose up dborder redis dbinventory inventory paymentgateway email dbcustomer customer -d
+docker compose up dborder redis dbinventory inventory paymentgateway kafka dbcustomer customer -d
 ```
 
-2. Catálogo `api` em `http://localhost:8080` (fora do compose).
+2. Catálogo `api` em `http://localhost:8080` com `KAFKA_BOOTSTRAP_SERVERS=localhost:9094`.
 
 3. Na pasta `order-service`:
 
@@ -42,20 +37,16 @@ mvn spring-boot:run
 | `REDIS_HOST` / `REDIS_PORT` | `localhost` / `6379` |
 | `SERVER_PORT` | `8093` |
 | `JWT_SECRET` / `JWT_ISSUER` | iguais ao `customer-service` |
-| `CATALOG_BASE_URL` | `http://localhost:8080` |
-| `INVENTORY_BASE_URL` | `http://localhost:8094` |
-| `PAYMENT_BASE_URL` | `http://localhost:8090` |
-| `EMAIL_BASE_URL` | `http://localhost:8092` |
-| `CUSTOMER_BASE_URL` | `http://localhost:8091` |
+| `KAFKA_BOOTSTRAP_SERVERS` | `localhost:9094` |
 | `CART_TTL_DAYS` | `7` |
 
 ## Docker
 
 ```bash
-docker compose up --build dborder redis order inventory paymentgateway email customer
+docker compose up --build dborder redis kafka order inventory paymentgateway email customer
 ```
 
-API: `http://localhost:8093` (catálogo no host: `CATALOG_BASE_URL=http://host.docker.internal:8080`).
+API: `http://localhost:8093`. O catálogo (`api`) precisa do Kafka no host ao rodar fora do compose.
 
 ## Carrinho: guest vs JWT
 
@@ -95,12 +86,25 @@ API: `http://localhost:8093` (catálogo no host: `CATALOG_BASE_URL=http://host.d
 }
 ```
 
-Fluxo: valida carrinho → catálogo → reserva estoque → pedido `PENDING_PAYMENT` → pagamento → commit/release estoque → e-mail se `PAID` → limpa carrinho.
+Fluxo: valida carrinho → **Kafka** catálogo → reserva estoque → pedido `PENDING_PAYMENT` → pagamento → commit/release estoque → **`vaultgame.order.paid`** se `PAID` → limpa carrinho.
 
 ## Erros
 
 `EMPTY_CART`, `MISSING_CART_IDENTITY`, `IDEMPOTENCY_CONFLICT`, `ORDER_NOT_FOUND`, `CATALOG_PRODUCT_NOT_FOUND`, `DOWNSTREAM_ERROR`, `UNAUTHORIZED`, etc.
 
-## Kafka (futuro)
+## Kafka
 
-Stub `OrderPlacedEvent` em `infrastructure/messaging`.
+### Checkout (request-reply)
+
+| Tópico | Uso |
+|--------|-----|
+| `vaultgame.checkout.commands.catalog` | Resolver produtos |
+| `vaultgame.checkout.commands.inventory` | Reserve / commit / release |
+| `vaultgame.checkout.commands.payment` | Cobrança |
+| `vaultgame.checkout.replies` | Respostas (chave = `correlationId`) |
+
+Timeout padrão: `vaultgame.checkout.kafka.reply-timeout` (10s).
+
+### Eventos
+
+Tópico **`vaultgame.order.paid`** — payload inclui `orderId`, `customerId`, `email`, `fullName`, `total`, `currency`. Chave Kafka: `orderId`.
